@@ -2,28 +2,232 @@
 <html>
 <head>
     <title>Library Management System</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: white;
+            text-align: center;
+            margin: 0;
+        }
+
+        .container {
+            margin-top: 40px;
+        }
+
+        .box {
+            background: white;
+            color: black;
+            padding: 20px;
+            margin: 20px auto;
+            width: 350px;
+            border-radius: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 5px;
+            width: 80%;
+        }
+
+        button {
+            background: #2a5298;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1e3c72;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .book {
+            background: #f2f2f2;
+            margin: 5px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
-<body style="font-family: Arial; text-align:center; margin-top:50px;">
+
+<body>
+
+<div class="container">
 
     <h1>📚 Library Management System</h1>
-    <p>A Python CLI-based project</p>
+    <p>Python CLI Project (Web Demo Version)</p>
 
-    <h3>🚀 Features</h3>
-    <ul style="list-style:none;">
-        <li>Login & Register</li>
-        <li>Search Books</li>
-        <li>Issue Books</li>
-    </ul>
+    <!-- LOGIN -->
+    <div class="box" id="loginBox">
+        <h3>🔐 Login</h3>
+        <input id="loginUser" placeholder="Username"><br>
+        <input id="loginPass" type="password" placeholder="Password"><br>
+        <button onclick="login()">Login</button>
+        <p>New user? <a href="#" onclick="showRegister()">Register</a></p>
+    </div>
 
-    <h3>📂 GitHub Repo</h3>
-    <a href="https://github.com/nandinipanyala2003/library-project">
-        View Code
-    </a>
+    <!-- REGISTER -->
+    <div class="box hidden" id="registerBox">
+        <h3>➕ Register</h3>
+        <input id="regUser" placeholder="Username"><br>
+        <input id="regPass" type="password" placeholder="Password"><br>
+        <button onclick="register()">Register</button>
+        <p>Already user? <a href="#" onclick="showLogin()">Login</a></p>
+    </div>
 
-    <h3>📸 Screenshots</h3>
-    <img src="screenshots/dashboard.png" width="500"><br><br>
-    <img src="screenshots/search.png" width="500"><br><br>
-    <img src="screenshots/books.png" width="500">
+    <!-- DASHBOARD -->
+    <div class="hidden" id="dashboard">
+        <h2>👋 Welcome <span id="username"></span></h2>
+
+        <button onclick="showBooks()">📚 View Books</button>
+        <button onclick="showSearch()">🔍 Search</button>
+        <button onclick="showAdd()">➕ Add Book</button>
+        <button onclick="logout()">🚪 Logout</button>
+
+        <!-- BOOK LIST -->
+        <div id="booksSection" class="hidden">
+            <h3>📚 Books</h3>
+            <div id="bookList"></div>
+        </div>
+
+        <!-- SEARCH -->
+        <div id="searchSection" class="hidden">
+            <h3>🔍 Search Books</h3>
+            <input id="searchInput" placeholder="Search...">
+            <button onclick="search()">Search</button>
+            <div id="searchResult"></div>
+        </div>
+
+        <!-- ADD BOOK -->
+        <div id="addSection" class="hidden">
+            <h3>➕ Add Book</h3>
+            <input id="bookTitle" placeholder="Title"><br>
+            <input id="bookAuthor" placeholder="Author"><br>
+            <button onclick="addBook()">Add</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+
+let users = [];
+let books = [
+    {title:"Python Crash Course", author:"Eric Matthes", available:true},
+    {title:"Clean Code", author:"Robert Martin", available:true},
+    {title:"Head First Java", author:"Kathy Sierra", available:true}
+];
+
+let currentUser = "";
+
+function showRegister(){
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("registerBox").classList.remove("hidden");
+}
+
+function showLogin(){
+    document.getElementById("registerBox").classList.add("hidden");
+    document.getElementById("loginBox").classList.remove("hidden");
+}
+
+function register(){
+    let u = document.getElementById("regUser").value;
+    let p = document.getElementById("regPass").value;
+
+    users.push({user:u, pass:p});
+    alert("Registered Successfully ✅");
+    showLogin();
+}
+
+function login(){
+    let u = document.getElementById("loginUser").value;
+    let p = document.getElementById("loginPass").value;
+
+    let found = users.find(x => x.user === u && x.pass === p);
+
+    if(found){
+        currentUser = u;
+        document.getElementById("username").innerText = u;
+        document.getElementById("loginBox").classList.add("hidden");
+        document.getElementById("dashboard").classList.remove("hidden");
+    } else {
+        alert("Wrong credentials ❌");
+    }
+}
+
+function logout(){
+    location.reload();
+}
+
+function showBooks(){
+    hideAll();
+    let list = document.getElementById("bookList");
+    list.innerHTML = "";
+
+    books.forEach((b,i)=>{
+        list.innerHTML += `<div class="book">
+            ${b.title} - ${b.author} 
+            <br>
+            ${b.available ? "✅ Available" : "❌ Issued"}
+            <br>
+            <button onclick="issueBook(${i})">Issue</button>
+        </div>`;
+    });
+
+    document.getElementById("booksSection").classList.remove("hidden");
+}
+
+function issueBook(i){
+    if(books[i].available){
+        books[i].available = false;
+        alert("Book Issued ✅");
+        showBooks();
+    } else {
+        alert("Already Issued ❌");
+    }
+}
+
+function showSearch(){
+    hideAll();
+    document.getElementById("searchSection").classList.remove("hidden");
+}
+
+function search(){
+    let val = document.getElementById("searchInput").value.toLowerCase();
+    let res = books.filter(b => b.title.toLowerCase().includes(val));
+
+    let output = document.getElementById("searchResult");
+    output.innerHTML = "";
+
+    res.forEach(b=>{
+        output.innerHTML += `<div class="book">${b.title} - ${b.author}</div>`;
+    });
+}
+
+function showAdd(){
+    hideAll();
+    document.getElementById("addSection").classList.remove("hidden");
+}
+
+function addBook(){
+    let t = document.getElementById("bookTitle").value;
+    let a = document.getElementById("bookAuthor").value;
+
+    books.push({title:t, author:a, available:true});
+    alert("Book Added ✅");
+}
+
+function hideAll(){
+    document.getElementById("booksSection").classList.add("hidden");
+    document.getElementById("searchSection").classList.add("hidden");
+    document.getElementById("addSection").classList.add("hidden");
+}
+
+</script>
 
 </body>
 </html>
