@@ -5,7 +5,7 @@
     <style>
         body {
             font-family: Arial;
-            background: linear-gradient(to right, #1e3c72, #2a5298);
+            background: linear-gradient(to right, #141e30, #243b55);
             color: white;
             text-align: center;
             margin: 0;
@@ -28,17 +28,18 @@
             padding: 10px;
             margin: 5px;
             width: 80%;
+            border-radius: 5px;
+            border: none;
         }
 
         button {
-            background: #2a5298;
+            background: #ff7b00;
             color: white;
-            border: none;
             cursor: pointer;
         }
 
         button:hover {
-            background: #1e3c72;
+            background: #ff5500;
         }
 
         .hidden {
@@ -46,10 +47,23 @@
         }
 
         .book {
-            background: #f2f2f2;
-            margin: 5px;
-            padding: 10px;
-            border-radius: 5px;
+            background: #ffffff;
+            color: black;
+            margin: 10px auto;
+            padding: 15px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        }
+
+        .available {
+            color: green;
+            font-weight: bold;
+        }
+
+        .issued {
+            color: red;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -59,7 +73,7 @@
 <div class="container">
 
     <h1>📚 Library Management System</h1>
-    <p>Python CLI Project (Web Demo Version)</p>
+    <p>Web Demo Version</p>
 
     <!-- LOGIN -->
     <div class="box" id="loginBox">
@@ -169,11 +183,13 @@ function showBooks(){
     list.innerHTML = "";
 
     books.forEach((b,i)=>{
-        list.innerHTML += `<div class="book">
-            ${b.title} - ${b.author} 
-            <br>
-            ${b.available ? "✅ Available" : "❌ Issued"}
-            <br>
+        list.innerHTML += `
+        <div class="book">
+            <b>${b.title}</b><br>
+            ${b.author}<br>
+            <span class="${b.available ? 'available':'issued'}">
+                ${b.available ? "Available" : "Issued"}
+            </span><br><br>
             <button onclick="issueBook(${i})">Issue</button>
         </div>`;
     });
